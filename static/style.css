@@ -1,0 +1,104 @@
+/* style.css */
+
+
+:root{
+--bg:#0c0f13;--panel:#121821;--tile:#1b2430;--tile-border:#2a3442;--correct:#25a06e;--present:#c7a633;--absent:#3b4656;--text:#e7eef7;--muted:#9fb0c7;--accent:#6fb1ff;--danger:#ff6b6b;
+--shadow:0 10px 30px rgba(0,0,0,.35);
+--radius:14px;
+}
+
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+margin:0;background:radial-gradient(1200px 800px at 10% 10%, #17202c 0%, var(--bg) 60%);
+color:var(--text);font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+display:flex;align-items:center;justify-content:center;padding:20px;
+}
+
+
+.app{width:min(900px, 96vw);}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.brand{display:flex;gap:10px;align-items:center}
+.logo{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#243142,#10161f);display:grid;place-items:center;box-shadow:var(--shadow)}
+.logo svg{width:26px;height:26px;fill:var(--accent)}
+h1{font-size:22px;margin:0;letter-spacing:.5px}
+.controls{display:flex;gap:10px}
+.btn{appearance:none;border:1px solid var(--tile-border);background:var(--panel);color:var(--text);padding:10px 14px;border-radius:var(--radius);cursor:pointer;transition:.2s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #fdfdfd;
+  color: #333;
+}
+
+.app {
+  max-width: 600px;
+  margin: auto;
+  padding: 1rem;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+}
+
+.brand .logo {
+  width: 40px;
+  height: 40px;
+  margin-right: 0.5rem;
+}
+
+.controls .btn {
+  margin-left: 0.5rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.input-area {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+#guessBox {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #aaa;
+  border-top: none;
+  background: #fff;
+  display: none;
+  z-index: 10;
+}
+
+.dropdown-option {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.dropdown-option:hover {
+  background: #f0f0f0;
+}

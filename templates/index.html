@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pterodactle</title>
+  <meta name="description" content="Pterodactle – a dinosaur-flavored Wordle built with Flask" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <div class="logo">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M21 7l-9-4-9 4v2h18V7zm-9 3L3 9v11h18V9l-9 1z"/>
+          </svg>
+        </div>
+        <h1>Pterodactle</h1>
+      </div>
+      <div class="controls">
+        <button class="btn">New Game</button>
+        <button class="btn">Help</button>
+      </div>
+    </header>
+
+    <main>
+      <div class="input-area">
+        <input type="text" id="guessBox" placeholder="Type a dinosaur name..." autocomplete="off">
+        <div id="dropdown" class="dropdown"></div>
+      </div>
+
+      <div class="grid">
+        <!-- word grid goes here -->
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const dinoNames = {{ dino_names|tojson | safe }};
+    const guessBox = document.getElementById("guessBox");
+    const dropdown = document.getElementById("dropdown");
+
+    guessBox.addEventListener("input", () => {
+      const query = guessBox.value.toLowerCase();
+      dropdown.innerHTML = "";
+
+      if (query.length === 0) {
+        dropdown.style.display = "none";
+        return;
+      }
+
+      const matches = dinoNames.filter(name => name.toLowerCase().includes(query));
+      if (matches.length === 0) {
+        dropdown.style.display = "none";
+        return;
+      }
+
+      matches.forEach(name => {
+        const option = document.createElement("div");
+        option.classList.add("dropdown-option");
+        option.textContent = name;
+        option.onclick = () => {
+          guessBox.value = name;
+          dropdown.innerHTML = "";
+          dropdown.style.display = "none";
+        };
+        dropdown.appendChild(option);
+      });
+
+      dropdown.style.display = "block";
+    });
+  </script>
+</body>
+</html>
