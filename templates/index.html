@@ -1,75 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pterodactle</title>
-  <meta name="description" content="Pterodactle – a dinosaur-flavored Wordle built with Flask" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dino Guessing Game</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="app">
+    <!-- Header -->
     <header>
       <div class="brand">
         <div class="logo">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M21 7l-9-4-9 4v2h18V7zm-9 3L3 9v11h18V9l-9 1z"/>
+            <path d="M12 2L15 8H9L12 2ZM12 22L9 16H15L12 22Z" />
           </svg>
         </div>
         <h1>Pterodactle</h1>
       </div>
       <div class="controls">
-        <button class="btn">New Game</button>
-        <button class="btn">Help</button>
+        <button id="themeToggle" class="btn"></button>
       </div>
     </header>
 
-    <main>
-      <div class="input-area">
-        <input type="text" id="guessBox" placeholder="Type a dinosaur name..." autocomplete="off">
-        <div id="dropdown" class="dropdown"></div>
-      </div>
-
-      <div class="grid">
-        <!-- word grid goes here -->
-      </div>
-    </main>
+    <!-- Input Area -->
+    <div class="input-area">
+      <input type="text" id="guessBox" placeholder="Type a dinosaur name..." autocomplete="off">
+      <button id="submitGuess" class="btn">Submit</button>
+      <div id="dropdown" class="dropdown"></div>
+    </div>
   </div>
 
   <script>
-    const dinoNames = {{ dino_names|tojson | safe }};
+    // Theme toggle logic
+    const themeToggle = document.getElementById('themeToggle');
+
+    function updateThemeIcon() {
+      if (document.body.classList.contains('light-mode')) {
+        themeToggle.textContent = "☀️ Toggle Theme";
+      } else {
+        themeToggle.textContent = "🌙 Toggle Theme";
+      }
+    }
+
+    // Initialize correct icon on page load
+    updateThemeIcon();
+
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('light-mode');
+      updateThemeIcon();
+    });
+
+    // Dropdown logic
     const guessBox = document.getElementById("guessBox");
     const dropdown = document.getElementById("dropdown");
+    const options = {{ dino_names|tojson }};
 
-    guessBox.addEventListener("input", () => {
-      const query = guessBox.value.toLowerCase();
+    guessBox.addEventListener("input", function() {
+      const query = this.value.toLowerCase();
       dropdown.innerHTML = "";
 
-      if (query.length === 0) {
-        dropdown.style.display = "none";
-        return;
-      }
+      if (query.length > 0) {
+        const matches = options.filter(name =>
+          name.toLowerCase().startsWith(query)
+        );
 
-      const matches = dinoNames.filter(name => name.toLowerCase().includes(query));
-      if (matches.length === 0) {
-        dropdown.style.display = "none";
-        return;
-      }
+        if (matches.length > 0) {
+          matches.forEach(match => {
+            const option = document.createElement("div");
+            option.classList.add("dropdown-option");
+            option.textContent = match;
 
-      matches.forEach(name => {
-        const option = document.createElement("div");
-        option.classList.add("dropdown-option");
-        option.textContent = name;
-        option.onclick = () => {
-          guessBox.value = name;
-          dropdown.innerHTML = "";
+            option.addEventListener("click", () => {
+              guessBox.value = match;
+              dropdown.style.display = "none";
+            });
+
+            dropdown.appendChild(option);
+          });
+          dropdown.style.display = "block";
+        } else {
           dropdown.style.display = "none";
-        };
-        dropdown.appendChild(option);
-      });
-
-      dropdown.style.display = "block";
+        }
+      } else {
+        dropdown.style.display = "none";
+      }
     });
+
+    // Hide dropdown when clicking outside
+    document.addEventListener("click", e => {
+      if (!e.target.closest(".input-area")) {
+        dropdown.style.display = "none";
+      }
+    });
+  const submitBtn = document.getElementById("submitGuess");
+
+  submitBtn.addEventListener("click", () => {
+    const guess = guessBox.value.trim();
+    if (guess) {
+      dropdown.style.display = "none";
+      guessBox.value = "";
+    }
+  });
   </script>
 </body>
 </html>

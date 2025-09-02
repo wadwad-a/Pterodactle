@@ -1,50 +1,24 @@
-/* style.css */
-
-
-:root{
---bg:#0c0f13;--panel:#121821;--tile:#1b2430;--tile-border:#2a3442;--correct:#25a06e;--present:#c7a633;--absent:#3b4656;--text:#e7eef7;--muted:#9fb0c7;--accent:#6fb1ff;--danger:#ff6b6b;
---shadow:0 10px 30px rgba(0,0,0,.35);
---radius:14px;
-}
-
-
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-margin:0;background:radial-gradient(1200px 800px at 10% 10%, #17202c 0%, var(--bg) 60%);
-color:var(--text);font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-display:flex;align-items:center;justify-content:center;padding:20px;
-}
-
-
-.app{width:min(900px, 96vw);}
-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.brand{display:flex;gap:10px;align-items:center}
-.logo{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#243142,#10161f);display:grid;place-items:center;box-shadow:var(--shadow)}
-.logo svg{width:26px;height:26px;fill:var(--accent)}
-h1{font-size:22px;margin:0;letter-spacing:.5px}
-.controls{display:flex;gap:10px}
-.btn{appearance:none;border:1px solid var(--tile-border);background:var(--panel);color:var(--text);padding:10px 14px;border-radius:var(--radius);cursor:pointer;transition:.2s}
-.btn:hover{border-color:var(--accent);color:var(--accent)}
-
+/* Base styles (dark mode by default) */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #fdfdfd;
-  color: #333;
+  background: #121212;
+  color: #ffffff;
+  transition: background 0.3s, color 0.3s;
 }
 
 .app {
-  max-width: 600px;
-  margin: auto;
-  padding: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
+/* Header */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 20px;
 }
 
 .brand {
@@ -52,53 +26,117 @@ header {
   align-items: center;
 }
 
-.brand .logo {
+.brand .logo svg {
   width: 40px;
   height: 40px;
-  margin-right: 0.5rem;
+  fill: currentColor;
+  margin-right: 10px;
 }
 
-.controls .btn {
-  margin-left: 0.5rem;
-  padding: 0.5rem 1rem;
+/* Button */
+.btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
-  border: 1px solid #aaa;
-  border-radius: 5px;
-  background: #fff;
+  background: #444;
+  color: #fff;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+.btn:hover {
+  background: #666;
 }
 
+/* Input */
 .input-area {
   position: relative;
-  margin-bottom: 1rem;
+  margin-bottom: 20px;
 }
 
 #guessBox {
   width: 100%;
-  padding: 0.5rem;
-  font-size: 1rem;
-  border: 1px solid #aaa;
-  border-radius: 5px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  outline: none;
+  background: #1e1e1e;
+  color: #fff;
 }
 
+/* Dropdown */
 .dropdown {
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
-  max-height: 150px;
-  overflow-y: auto;
-  border: 1px solid #aaa;
+  background: #1e1e1e;
+  border: 1px solid #444;
   border-top: none;
-  background: #fff;
   display: none;
+  max-height: 200px;
+  overflow-y: auto;
   z-index: 10;
 }
 
 .dropdown-option {
-  padding: 0.5rem;
+  padding: 10px;
   cursor: pointer;
 }
-
 .dropdown-option:hover {
-  background: #f0f0f0;
+  background: #333;
+}
+
+/* Dino List */
+.dino-list ul {
+  list-style: none;
+  padding: 0;
+}
+.dino-list li {
+  padding: 5px 0;
+  border-bottom: 1px solid #333;
+}
+
+/* Light mode */
+body.light-mode {
+  background: #ffffff;
+  color: #000000;
+}
+
+body.light-mode #guessBox {
+  background: #f5f5f5;
+  color: #000;
+  border: 1px solid #ccc;
+}
+
+body.light-mode .dropdown {
+  background: #fff;
+  border: 1px solid #ccc;
+}
+
+body.light-mode .dropdown-option:hover {
+  background: #eee;
+}
+
+body.light-mode .btn {
+  background: #ddd;
+  color: #000;
+}
+body.light-mode .btn:hover {
+  background: #bbb;
+}
+.input-area {
+  position: relative;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+#guessBox {
+  flex: 1;
+}
+
+#submitGuess {
+  flex-shrink: 0;
 }
