@@ -183,10 +183,18 @@ body.light-mode .btn:hover {
 
 /* Light mode adjustments */
 body.light-mode .answer-box {
-  background: #dcdcdc; /* light grey */
-  color: #000000;
+  background: #dcdcdc;
+  color: #000;
 }
 
-body.light-mode .answer-header {
-  color: #000000;
+/* Dark mode boxes */
+body:not(.light-mode) .answer-box {
+  background: #2e2e2e;
+  color: #fff;
+}
+
+/* Correct guess highlight */
+.answer-box.correct {
+  background-color: #4CAF50 !important;
+  color: #fff !important;
 }

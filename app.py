@@ -1,17 +1,39 @@
 from flask import Flask, render_template
 import pandas as pd
+import datetime, random
 
 app = Flask(__name__)
 
 dinoDF = pd.read_csv('data.csv')
 dino_names = dinoDF['name'].dropna().tolist()
-
-# Convert to list of dicts for JSON serialization
 dinos = dinoDF.to_dict(orient="records")
+
+# Global state
+daily_dino = None
+last_date = None
+
+def pick_daily_dino():
+    return random.choice(dinos)
+
+def get_daily_dino():
+    global daily_dino, last_date
+    today = datetime.date.today()
+
+    # If we haven't picked yet or the day changed, pick a new one
+    if last_date != today:
+        daily_dino = pick_daily_dino()
+        last_date = today
+    return daily_dino
 
 @app.route("/")
 def index():
-    return render_template("index.html", dino_names=dino_names, dinos=dinos)
+    daily_dino = get_daily_dino()
+    return render_template(
+        "index.html",
+        dino_names=dino_names,
+        dinos=dinos,
+        daily_dino=daily_dino
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)
