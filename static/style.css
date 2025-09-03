@@ -140,3 +140,53 @@ body.light-mode .btn:hover {
 #submitGuess {
   flex-shrink: 0;
 }
+
+.answers {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Row grid */
+.answer-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr; /* Name wider */
+  gap: 10px;
+  align-items: stretch;
+}
+
+/* Header row */
+.answer-header {
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
+  padding: 5px 0;
+  color: #ffffff; /* default dark mode text */
+}
+
+/* Boxes (dark mode default) */
+.answer-box {
+  background: #2e2e2e;
+  color: #ffffff;
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* Light mode adjustments */
+body.light-mode .answer-box {
+  background: #dcdcdc; /* light grey */
+  color: #000000;
+}
+
+body.light-mode .answer-header {
+  color: #000000;
+}

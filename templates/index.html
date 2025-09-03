@@ -29,79 +29,121 @@
       <button id="submitGuess" class="btn">Submit</button>
       <div id="dropdown" class="dropdown"></div>
     </div>
+
+    <!-- Answers -->
+    <div class="answers">
+    </div>
   </div>
 
   <script>
-    // Theme toggle logic
-    const themeToggle = document.getElementById('themeToggle');
+  // Theme toggle logic
+  const themeToggle = document.getElementById('themeToggle');
 
-    function updateThemeIcon() {
-      if (document.body.classList.contains('light-mode')) {
-        themeToggle.textContent = "☀️ Toggle Theme";
-      } else {
-        themeToggle.textContent = "🌙 Toggle Theme";
-      }
+  function updateThemeIcon() {
+    if (document.body.classList.contains('light-mode')) {
+      themeToggle.textContent = "☀️ Toggle Theme";
+    } else {
+      themeToggle.textContent = "🌙 Toggle Theme";
     }
+  }
 
-    // Initialize correct icon on page load
+  updateThemeIcon();
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('light-mode');
     updateThemeIcon();
+  });
 
-    themeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('light-mode');
-      updateThemeIcon();
-    });
+  // Dropdown logic
+  const guessBox = document.getElementById("guessBox");
+  const dropdown = document.getElementById("dropdown");
+  const submitBtn = document.getElementById("submitGuess");
 
-    // Dropdown logic
-    const guessBox = document.getElementById("guessBox");
-    const dropdown = document.getElementById("dropdown");
-    const options = {{ dino_names|tojson }};
+  const options = {{ dino_names|tojson }};
+  const dinos = {{ dinos|tojson }}; // must pass full dino data from Flask
 
-    guessBox.addEventListener("input", function() {
-      const query = this.value.toLowerCase();
-      dropdown.innerHTML = "";
+  guessBox.addEventListener("input", function () {
+    const query = this.value.toLowerCase();
+    dropdown.innerHTML = "";
 
-      if (query.length > 0) {
-        const matches = options.filter(name =>
-          name.toLowerCase().startsWith(query)
-        );
+    if (query.length > 0) {
+      const matches = options.filter(name =>
+        name.toLowerCase().startsWith(query)
+      );
 
-        if (matches.length > 0) {
-          matches.forEach(match => {
-            const option = document.createElement("div");
-            option.classList.add("dropdown-option");
-            option.textContent = match;
+      if (matches.length > 0) {
+        matches.forEach(match => {
+          const option = document.createElement("div");
+          option.classList.add("dropdown-option");
+          option.textContent = match;
 
-            option.addEventListener("click", () => {
-              guessBox.value = match;
-              dropdown.style.display = "none";
-            });
-
-            dropdown.appendChild(option);
+          option.addEventListener("click", () => {
+            guessBox.value = match;
+            dropdown.style.display = "none";
           });
-          dropdown.style.display = "block";
-        } else {
-          dropdown.style.display = "none";
-        }
+
+          dropdown.appendChild(option);
+        });
+        dropdown.style.display = "block";
       } else {
         dropdown.style.display = "none";
       }
-    });
+    } else {
+      dropdown.style.display = "none";
+    }
+  });
 
-    // Hide dropdown when clicking outside
-    document.addEventListener("click", e => {
-      if (!e.target.closest(".input-area")) {
-        dropdown.style.display = "none";
-      }
-    });
-  const submitBtn = document.getElementById("submitGuess");
+  document.addEventListener("click", e => {
+    if (!e.target.closest(".input-area")) {
+      dropdown.style.display = "none";
+    }
+  });
+
+  // Answer grid logic
+  const answersContainer = document.querySelector(".answers");
+
+  // Add header row once
+  const headerRow = document.createElement("div");
+  headerRow.classList.add("answer-row", "header-row");
+  ["Name", "Diet", "Period", "Country", "Type", "Length"].forEach(label => {
+    const header = document.createElement("div");
+    header.classList.add("answer-header");
+    header.textContent = label;
+    headerRow.appendChild(header);
+  });
+  answersContainer.appendChild(headerRow);
 
   submitBtn.addEventListener("click", () => {
     const guess = guessBox.value.trim();
     if (guess) {
       dropdown.style.display = "none";
       guessBox.value = "";
+
+      const dino = dinos.find(d => d.name.toLowerCase() === guess.toLowerCase());
+      if (dino) {
+        const row = document.createElement("div");
+        row.classList.add("answer-row");
+
+        const fields = [
+          dino.name,
+          dino.diet,
+          (dino.period || "").split(" ").slice(0, 2).join(" "),
+          dino.lived_in,
+          dino.type,
+          dino.length
+        ];
+
+        fields.forEach(value => {
+          const box = document.createElement("div");
+          box.classList.add("answer-box");
+          box.textContent = value || "Unknown";
+          row.appendChild(box);
+        });
+
+        answersContainer.appendChild(row);
+      }
     }
   });
-  </script>
+</script>
+
 </body>
 </html>
