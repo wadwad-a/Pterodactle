@@ -198,3 +198,31 @@ body:not(.light-mode) .answer-box {
   background-color: #4CAF50 !important;
   color: #fff !important;
 }
+
+.win-popup {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+body.light-mode .win-popup {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.win-content {
+  background: #2e2e2e;
+  padding: 20px;
+  border-radius: 10px;
+  color: #fff;
+  text-align: center;
+  max-width: 300px;
+}
+
+body.light-mode .win-content {
+  background: #fff;
+  color: #000;
+}

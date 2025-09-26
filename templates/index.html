@@ -11,15 +11,12 @@
     <!-- Header -->
     <header>
       <div class="brand">
-        <div class="logo">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M12 2L15 8H9L12 2ZM12 22L9 16H15L12 22Z" />
-          </svg>
-        </div>
-        <h1>Pterodactle</h1>
+        <span class="logo">🦖</span>
+        <h1 id="title">Pterodactle Daily</h1>
       </div>
       <div class="controls">
-        <button id="themeToggle" class="btn"></button>
+        <button id="themeToggle" class="btn">Toggle Theme</button>
+        <button id="modeToggle" class="btn">Practice Mode</button>
       </div>
     </header>
 
@@ -34,131 +31,224 @@
     <div class="answers">
     </div>
   </div>
+<div id="winPopup" class="win-popup" style="display:none;">
+  <div class="win-content">
+    <h2 id="winMessage"></h2>
+    <p id="dinoMessage"></p>
+    <p id="guessesMessage"></p>
+    <button id="closePopup" class="btn">Close</button>
+  </div>
+</div>
+<script>
+(() => {
+  // server-provided data
+  const dailyDino = {{ daily_dino|tojson }};
+  const options = {{ dino_names|tojson }};
+  const dinos = {{ dinos|tojson }};
 
-  <script>
-const dailyDino = {{ daily_dino|tojson }}; // full dino object
-console.log("Today's dinosaur is:", dailyDino.name);
+  // UI elements
+  const themeToggle = document.getElementById('themeToggle');
+  const modeToggle = document.getElementById('modeToggle');
+  const titleEl = document.getElementById('title');
+  const guessBox = document.getElementById('guessBox');
+  const submitBtn = document.getElementById('submitGuess');
+  const dropdown = document.getElementById('dropdown');
+  const answersContainer = document.querySelector('.answers');
 
-// Theme toggle logic
-const themeToggle = document.getElementById('themeToggle');
-function updateThemeIcon() {
-  if (document.body.classList.contains('light-mode')) {
-    themeToggle.textContent = "☀️ Toggle Theme";
-  } else {
-    themeToggle.textContent = "🌙 Toggle Theme";
+  const winPopup = document.getElementById('winPopup');
+  const winMessage = document.getElementById('winMessage');
+  const dinoMessage = document.getElementById('dinoMessage');
+  const guessesMessage = document.getElementById('guessesMessage');
+  const closePopupBtn = document.getElementById('closePopup');
+
+  // state
+  let isPracticeMode = false;
+  let currentDino = dailyDino;
+  let guessCount = 0;
+
+  // Theme toggle (keeps your current behavior)
+  function updateThemeIcon() {
+    if (document.body.classList.contains('light-mode')) {
+      themeToggle.textContent = "☀️ Toggle Theme";
+    } else {
+      themeToggle.textContent = "🌙 Toggle Theme";
+    }
   }
-}
-updateThemeIcon();
-themeToggle.addEventListener('click', () => {
-  document.body.classList.toggle('light-mode');
   updateThemeIcon();
-});
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('light-mode');
+    updateThemeIcon();
+  });
 
-// Dropdown logic
-const guessBox = document.getElementById("guessBox");
-const dropdown = document.getElementById("dropdown");
-const submitBtn = document.getElementById("submitGuess");
-const options = {{ dino_names|tojson }};
-const dinos = {{ dinos|tojson }};
+  // Utility: create a fresh header row (so reset can re-add it safely)
+  function createHeaderRow() {
+    const headerRow = document.createElement('div');
+    headerRow.className = 'answer-row header-row';
+    ['Name', 'Diet', 'Period', 'Country', 'Type', 'Length'].forEach(label => {
+      const h = document.createElement('div');
+      h.className = 'answer-header';
+      h.textContent = label;
+      headerRow.appendChild(h);
+    });
+    return headerRow;
+  }
 
-guessBox.addEventListener("input", function () {
-  const query = this.value.toLowerCase();
-  dropdown.innerHTML = "";
+  // Reset board and guesses
+  function resetGame() {
+    guessCount = 0;
+    answersContainer.innerHTML = '';
+    answersContainer.appendChild(createHeaderRow());
+    guessBox.value = '';
+    dropdown.style.display = 'none';
+  }
 
-  if (query.length > 0) {
-    const matches = options.filter(name =>
-      name.toLowerCase().startsWith(query)
-    );
+  // pick a random dino (practice rerolls from whole pool)
+  function getRandomDino() {
+    return dinos[Math.floor(Math.random() * dinos.length)];
+  }
 
-    if (matches.length > 0) {
-      matches.forEach(match => {
-        const option = document.createElement("div");
-        option.classList.add("dropdown-option");
-        option.textContent = match;
+  // initial header row
+  answersContainer.appendChild(createHeaderRow());
 
-        option.addEventListener("click", () => {
-          guessBox.value = match;
-          dropdown.style.display = "none";
+  // Mode toggle logic
+  modeToggle.addEventListener('click', () => {
+    isPracticeMode = !isPracticeMode;
+    if (isPracticeMode) {
+      titleEl.textContent = "Pterodactle Practice";
+      modeToggle.textContent = "Daily Mode";
+      currentDino = getRandomDino();
+    } else {
+      titleEl.textContent = "Pterodactle Daily";
+      modeToggle.textContent = "Practice Mode";
+      currentDino = dailyDino;
+    }
+    console.log("Selected dinosaur:", currentDino.name);
+    resetGame();
+  });
+
+  // Dropdown autocomplete
+  guessBox.addEventListener("input", function () {
+    const query = this.value.toLowerCase();
+    dropdown.innerHTML = "";
+
+    if (query.length > 0) {
+      const matches = options.filter(name => name.toLowerCase().startsWith(query));
+      if (matches.length > 0) {
+        matches.forEach(match => {
+          const option = document.createElement("div");
+          option.classList.add("dropdown-option");
+          option.textContent = match;
+          option.addEventListener("click", () => {
+            guessBox.value = match;
+            dropdown.style.display = "none";
+          });
+          dropdown.appendChild(option);
         });
-
-        dropdown.appendChild(option);
-      });
-      dropdown.style.display = "block";
+        dropdown.style.display = "block";
+      } else {
+        dropdown.style.display = "none";
+      }
     } else {
       dropdown.style.display = "none";
     }
-  } else {
+  });
+
+  document.addEventListener("click", e => {
+    if (!e.target.closest(".input-area")) {
+      dropdown.style.display = "none";
+    }
+  });
+
+  // Submit handler (used by click and Enter)
+  function submitGuess() {
+    const guess = guessBox.value.trim();
+    if (!guess) return;
+
     dropdown.style.display = "none";
+    guessBox.value = "";
+
+    const guessedDino = dinos.find(d => d.name.toLowerCase() === guess.toLowerCase());
+    if (!guessedDino) return;
+
+    guessCount++;
+
+    const row = document.createElement("div");
+    row.classList.add("answer-row");
+
+    const fields = [
+      guessedDino.name,
+      guessedDino.diet,
+      (guessedDino.period || "").split(" ").slice(0, 2).join(" "),
+      guessedDino.lived_in,
+      guessedDino.type,
+      guessedDino.length
+    ];
+
+    const targetFields = [
+      currentDino.name || '',
+      currentDino.diet || '',
+      (currentDino.period || '').split(" ").slice(0, 2).join(" "),
+      currentDino.lived_in || '',
+      currentDino.type || '',
+      currentDino.length || ''
+    ];
+
+    fields.forEach((value, i) => {
+      const box = document.createElement("div");
+      box.classList.add("answer-box");
+      box.textContent = value || "Unknown";
+
+      // case-insensitive comparison, highlight correct categories
+      const a = (value || '').toString().toLowerCase();
+      const b = (targetFields[i] || '').toString().toLowerCase();
+      if (a && b && a === b) {
+        box.classList.add("correct");
+      }
+
+      row.appendChild(box);
+    });
+
+    answersContainer.appendChild(row);
+
+    // Win check against currentDino (case-insensitive)
+    if ((guessedDino.name || '').toLowerCase() === (currentDino.name || '').toLowerCase()) {
+      // Fill popup text
+      winMessage.textContent = `You win! 🎉`;
+      dinoMessage.textContent = `The dinosaur was ${currentDino.name}.`;
+      guessesMessage.textContent = `You solved the Pterodactle in ${guessCount} guess${guessCount === 1 ? '' : 'es'}.`;
+
+      // Make the popup button switch to practice and reroll
+      closePopupBtn.textContent = "Practice";
+      closePopupBtn.onclick = () => {
+        winPopup.style.display = "none";
+        if (!isPracticeMode) {
+          isPracticeMode = true;
+          titleEl.textContent = "Pterodactle Practice";
+          modeToggle.textContent = "Daily Mode";
+        }
+        currentDino = getRandomDino();
+        console.log("Selected dinosaur:", currentDino.name);
+        resetGame();
+      };
+
+      // **show the popup**
+      winPopup.style.display = "flex";
+    }
   }
-});
 
-document.addEventListener("click", e => {
-  if (!e.target.closest(".input-area")) {
-    dropdown.style.display = "none";
-  }
-});
+  submitBtn.addEventListener('click', submitGuess);
+  guessBox.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitGuess();
+    }
+  });
 
-// Answer grid logic
-const answersContainer = document.querySelector(".answers");
-
-// Add header row once
-const headerRow = document.createElement("div");
-headerRow.classList.add("answer-row", "header-row");
-["Name", "Diet", "Period", "Country", "Type", "Length"].forEach(label => {
-  const header = document.createElement("div");
-  header.classList.add("answer-header");
-  header.textContent = label;
-  headerRow.appendChild(header);
-});
-answersContainer.appendChild(headerRow);
-
-// Submit guess logic
-submitBtn.addEventListener("click", () => {
-  const guess = guessBox.value.trim();
-  if (!guess) return;
-
-  dropdown.style.display = "none";
-  guessBox.value = "";
-
-  const guessedDino = dinos.find(d => d.name.toLowerCase() === guess.toLowerCase());
-  if (!guessedDino) return;
-
-  const row = document.createElement("div");
-  row.classList.add("answer-row");
-
-  const fields = [
-    guessedDino.name,
-    guessedDino.diet,
-    (guessedDino.period || "").split(" ").slice(0, 2).join(" "),
-    guessedDino.lived_in,
-    guessedDino.type,
-    guessedDino.length
-  ];
-
-  const dailyFields = [
-    dailyDino.name,
-    dailyDino.diet,
-    (dailyDino.period || "").split(" ").slice(0, 2).join(" "),
-    dailyDino.lived_in,
-    dailyDino.type,
-    dailyDino.length
-  ];
-
-  fields.forEach((value, i) => {
-  const box = document.createElement("div");
-  box.classList.add("answer-box");
-  box.textContent = value || "Unknown";
-
-  // Add green highlight if it matches daily dino (skip name)
-  if (value && value === dailyFields[i]) {
-    box.classList.add("correct");
-  }
-
-  row.appendChild(box);
-});
-  answersContainer.appendChild(row);
-});
+  // Optional: make sure popup close (Practice) works even if clicked outside context
+  closePopupBtn.addEventListener('keydown', e => {
+    if (e.key === 'Enter') closePopupBtn.click();
+  });
+  })();
 </script>
-
 </body>
 </html>
